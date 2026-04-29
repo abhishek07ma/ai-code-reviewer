@@ -1,27 +1,8 @@
 # AI Code Reviewer
 
-> AI-powered code review tool that detects bugs, security vulnerabilities, performance issues, and suggests improvements in real time.
+An intelligent, full-stack application that acts as your personal expert code reviewer. Powered by the Anthropic Claude API, it automatically analyzes your code for bugs, security vulnerabilities, performance bottlenecks, and best practice violations.
 
-## Live Demo
-[Add your deployed URL here]
-
-## Screenshot
-![AI Code Review Tool Dashboard](client/src/assets/app.png)
-
-## Features
-
-- 🤖 **AI-powered code analysis** — Google Gemini API for deep analysis
-- 🐛 **Bug detection** — spot runtime errors and logic issues
-- 🔒 **Security scanning** — identify vulnerabilities and unsafe patterns
-- ⚡ **Performance insights** — flag inefficiencies and bottlenecks
-- 🖊️ **Monaco Editor** — VS Code engine in the browser
-- 📜 **Review history** — MongoDB-persisted past reviews per user
-- 📄 **PDF export** — download reviews as formatted PDFs
-- 🔐 **JWT authentication** — secure login/register with bcrypt passwords
-- ⚡ **Redis caching** — instant results for repeated code submissions
-- 🚦 **Rate limiting** — 10 reviews per IP per hour to prevent abuse
-- ⌨️ **Keyboard shortcut** — `Ctrl+Enter` to submit
-- 🌙 **Responsive dark UI** — Tailwind CSS dark theme
+![App Screenshot](./placeholder.png) <!-- Replace with real screenshot -->
 
 ## Tech Stack
 

@@ -85,6 +85,9 @@ no backticks:
         });
 
         if (!apiResponse.ok) {
+          if (apiResponse.status === 429) {
+            throw new Error("API_QUOTA_EXCEEDED");
+          }
           const errorBody = await apiResponse.text();
           throw new Error(`API error: ${apiResponse.status} ${apiResponse.statusText} - ${errorBody}`);
         }
@@ -97,8 +100,13 @@ no backticks:
         break;
       } catch (err) {
         console.error('API or Parse Error:', err.message);
+        
+        if (err.message === "API_QUOTA_EXCEEDED") {
+          return res.status(429).json({ error: "The AI service has reached its free tier usage limit. Please try again after a few minutes." });
+        }
+
         if (retries === 0) {
-          return res.status(500).json({ error: `API Error: ${err.message}. Ensure your .env GEMINI_API_KEY is valid.` });
+          return res.status(500).json({ error: `Analysis failed: ${err.message}` });
         }
         retries--;
       }

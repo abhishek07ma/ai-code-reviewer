@@ -1,102 +1,150 @@
 # AI Code Reviewer
 
-An intelligent, full-stack application that acts as your personal expert code reviewer. Powered by the Anthropic Claude API, it automatically analyzes your code for bugs, security vulnerabilities, performance bottlenecks, and best practice violations.
+> AI-powered code review tool that detects bugs, security vulnerabilities, performance issues, and suggests improvements in real time.
 
-![App Screenshot](./placeholder.png) <!-- Replace with real screenshot -->
+## Live Demo
+[Add your deployed URL here]
 
-## Tech Stack
-- **Frontend**: React.js, Vite, TailwindCSS, Monaco Editor
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB, Mongoose
-- **AI Model**: Anthropic Claude API (`claude-3-5-sonnet-20241022`)
-- **Deployment**: Vercel (Client) + Render (Server)
+## Screenshot
+![AI Code Review Tool Dashboard](client/src/assets/app.png)
 
 ## Features
-- **Instant Code Analysis**: Simply paste your code and get a detailed review in seconds.
-- **Language Auto-Detection**: Autodetects the language of the code you pasted.
-- **Categorized Feedback**: Review is split into clean tabs: Overview, Bugs, Security, Performance, and Best Practices.
-- **Improved Code Generator**: Outputs a perfectly refactored version of your code.
-- **Dark Mode UI**: Clean, professional dark theme styled with Tailwind CSS.
-- **Share & Export**: Download review as a PDF or copy improved code in one click.
-- **History Dashboard**: Keeps track of your last 10 code reviews and scores.
 
-## Setup Instructions
+- 🤖 **AI-powered code analysis** — Google Gemini API for deep analysis
+- 🐛 **Bug detection** — spot runtime errors and logic issues
+- 🔒 **Security scanning** — identify vulnerabilities and unsafe patterns
+- ⚡ **Performance insights** — flag inefficiencies and bottlenecks
+- 🖊️ **Monaco Editor** — VS Code engine in the browser
+- 📜 **Review history** — MongoDB-persisted past reviews per user
+- 📄 **PDF export** — download reviews as formatted PDFs
+- 🔐 **JWT authentication** — secure login/register with bcrypt passwords
+- ⚡ **Redis caching** — instant results for repeated code submissions
+- 🚦 **Rate limiting** — 10 reviews per IP per hour to prevent abuse
+- ⌨️ **Keyboard shortcut** — `Ctrl+Enter` to submit
+- 🌙 **Responsive dark UI** — Tailwind CSS dark theme
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, Vite, Tailwind CSS v4, Monaco Editor |
+| Backend | Node.js, Express.js |
+| Database | MongoDB, Mongoose |
+| Cache | Redis |
+| Auth | JWT, bcryptjs |
+| AI | Google Gemini 1.5 Flash API |
+
+## Project Structure
+
+```
+ai-code-reviewer/
+├── client/                  # React + Vite frontend
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AuthModal.jsx
+│   │   │   ├── Editor.jsx
+│   │   │   ├── History.jsx
+│   │   │   ├── IssueCard.jsx
+│   │   │   ├── ReviewPanel.jsx
+│   │   │   └── ScoreCard.jsx
+│   │   └── App.jsx
+│   ├── .env
+│   └── .env.example
+└── server/                  # Node.js + Express backend
+    ├── controllers/
+    │   ├── authController.js
+    │   └── reviewController.js
+    ├── middleware/
+    │   └── auth.js
+    ├── models/
+    │   ├── Review.js
+    │   └── User.js
+    ├── routes/
+    │   ├── auth.js
+    │   └── review.js
+    ├── utils/
+    │   └── cache.js
+    ├── .env
+    ├── .env.example
+    └── server.js
+```
+
+## Setup
 
 ### Prerequisites
-- Node.js (v16+)
-- MongoDB connection string (`MONGO_URI`)
-- Anthropic API Key (`ANTHROPIC_API_KEY`)
 
-### 1. Clone & Install Dependencies
-\`\`\`bash
-git clone https://github.com/your-username/ai-code-reviewer.git
+- Node.js 18+
+- MongoDB Atlas account (free tier works)
+- Google Gemini API key — [get one here](https://aistudio.google.com/app/apikey)
+- Redis — optional, falls back gracefully if unavailable
+
+### Installation
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/yourusername/ai-code-reviewer
 cd ai-code-reviewer
+```
 
-# Install Backend dependencies
+**2. Setup server**
+```bash
 cd server
 npm install
+cp .env.example .env
+# Fill in GEMINI_API_KEY, MONGO_URI, JWT_SECRET
+node server.js
+```
 
-# Install Frontend dependencies
-cd ../client
-npm install
-\`\`\`
-
-### 2. Configure Environment Variables
-Inside the `server` directory, create a `.env` file:
-
-| Variable | Description |
-| ---- | ----------- |
-| `ANTHROPIC_API_KEY` | Your Anthropic Claude API Key |
-| `MONGO_URI` | MongoDB Atlas (or local) Connection URI |
-| `PORT` | API Server port (default: `5000`) |
-
-Example `.env`:
-\`\`\`
-ANTHROPIC_API_KEY=sk-ant-api03-...
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/ai-reviewer
-PORT=5000
-\`\`\`
-
-### 3. Run the App Locally
-Open two terminal windows:
-
-**Terminal 1 (Backend)**:
-\`\`\`bash
-cd server
-npm start
-\`\`\`
-
-**Terminal 2 (Frontend)**:
-\`\`\`bash
+**3. Setup client**
+```bash
 cd client
+npm install
+cp .env.example .env
 npm run dev
-\`\`\`
+```
 
-Visit `http://localhost:5173` to start reviewing your code!
+### Environment Variables
 
----
+**Server (`server/.env`)**
 
-## How It Works
-1. **Submit**: User pastes code into the Monaco Editor and hits "Analyze Code" (or `Ctrl+Enter`).
-2. **Backend Parsing**: The backend receives the code string and formats it with an explicit system prompt.
-3. **Claude AI**: The Claude API analyzes it for software engineering best practices, security flaws, performance issues, and general bugs. It returns a strict, parsed JSON object.
-4. **Data Persistence**: The Node.js Express server saves this analysis to a MongoDB instance via Mongoose.
-5. **Viewing Results**: The frontend displays the final interactive dashboard containing scores, metrics, issues, fixes, and refactored code.
+| Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | ✅ | Google Gemini API key |
+| `MONGO_URI` | ✅ | MongoDB connection string |
+| `JWT_SECRET` | ✅ | Secret for JWT signing (min 32 chars) |
+| `REDIS_URL` | ❌ | Redis URL (optional, default: `redis://localhost:6379`) |
+| `PORT` | ❌ | Server port (default: `5000`) |
+
+**Client (`client/.env`)**
+
+| Variable | Required | Description |
+|---|---|---|
+| `VITE_API_URL` | ✅ | Backend base URL (e.g. `http://localhost:5000`) |
+
+## API Endpoints
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/review` | Optional | Submit code for AI review |
+| `GET` | `/api/history` | Optional | Fetch review history |
+| `GET` | `/api/review/:id` | None | Fetch a specific review |
+| `POST` | `/api/auth/register` | None | Register new user |
+| `POST` | `/api/auth/login` | None | Login and get JWT token |
+| `GET` | `/api/auth/me` | Required | Get current user info |
 
 ## Deployment
 
-**Vercel (Frontend)**:
-1. Push to GitHub.
-2. Import the project in Vercel.
-3. Keep the Root Directory config to `client`.
-4. Update your production frontend API URLs from `localhost:5000` to your Render API link.
-
-**Render (Backend)**:
-1. Create a "Web Service" in Render.
-2. Link your GitHub repo.
-3. Set root directory to `server`.
-4. Set Build command to `npm install` and Start command to `node server.js`.
-5. Add the mapped Environment Variables.
+| Service | Platform |
+|---|---|
+| Frontend | [Vercel](https://vercel.com) |
+| Backend | [Render](https://render.com) |
+| Database | [MongoDB Atlas](https://www.mongodb.com/atlas) |
+| Cache | [Redis Cloud](https://redis.io/cloud) (free tier) |
 
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Pull requests are welcome. Please open an issue first to discuss what you'd like to change.
+
+## License
+
+[MIT](LICENSE)

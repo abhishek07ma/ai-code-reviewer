@@ -5,6 +5,11 @@ const reviewSchema = new mongoose.Schema({
   language: { type: String, required: true },
   overall_score: { type: Number, required: true },
   review: { type: Object, required: true },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   createdAt: { type: Date, default: Date.now }
 });
 

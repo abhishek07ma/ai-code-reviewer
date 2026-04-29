@@ -1,9 +1,11 @@
 import express from 'express';
-import { createReview, getHistory } from '../controllers/reviewController.js';
+import { createReview, getHistory, getReviewById } from '../controllers/reviewController.js';
+import { optionalProtect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/review', createReview);
-router.get('/history', getHistory);
+router.post('/review', optionalProtect, createReview);
+router.get('/history', optionalProtect, getHistory);
+router.get('/review/:id', getReviewById);
 
 export default router;

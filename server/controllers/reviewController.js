@@ -1,4 +1,5 @@
 import Review from '../models/Review.js';
+import { getCached, setCache, generateCacheKey } from '../utils/cache.js';
 
 export const createReview = async (req, res) => {
   try {
@@ -6,6 +7,17 @@ export const createReview = async (req, res) => {
 
     if (!code || code.trim() === '') {
       return res.status(400).json({ error: 'Please enter some code' });
+    }
+
+    // Check Redis cache first
+    const cacheKey = generateCacheKey(code);
+    const cached = await getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json({
+        id: 'cached',
+        review: cached,
+        fromCache: true
+      });
     }
 
     const systemPrompt = `You are an expert code reviewer with deep knowledge of 
@@ -55,13 +67,12 @@ no backticks:
   "improved_code": "complete corrected version of the code"
 }`;
 
-    let response;
     let retries = 1;
     let parsedData = null;
 
     while (retries >= 0) {
       try {
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -80,10 +91,10 @@ no backticks:
 
         const data = await apiResponse.json();
         let textContent = data.candidates && data.candidates[0] ? data.candidates[0].content.parts[0].text : '';
-        
+
         textContent = textContent.replace(/```json/g, '').replace(/```/g, '').trim();
         parsedData = JSON.parse(textContent);
-        break; 
+        break;
       } catch (err) {
         console.error('API or Parse Error:', err.message);
         if (retries === 0) {
@@ -97,13 +108,17 @@ no backticks:
       return res.status(500).json({ error: 'Review failed. Please try again.' });
     }
 
+    // Save to Redis cache
+    await setCache(cacheKey, parsedData, 3600);
+
     let savedReview = null;
     try {
       const reviewDoc = new Review({
         code,
         language: parsedData.language || 'Unknown',
         overall_score: parsedData.overall_score || 0,
-        review: parsedData
+        review: parsedData,
+        userId: req.user ? req.user._id : null
       });
       savedReview = await reviewDoc.save();
     } catch (dbErr) {
@@ -123,7 +138,8 @@ no backticks:
 
 export const getHistory = async (req, res) => {
   try {
-    const reviews = await Review.find()
+    const filter = req.user ? { userId: req.user._id } : {};
+    const reviews = await Review.find(filter)
       .sort({ createdAt: -1 })
       .limit(10)
       .select('id language overall_score createdAt');
@@ -132,5 +148,17 @@ export const getHistory = async (req, res) => {
   } catch (error) {
     console.error('History Fetch Error:', error);
     return res.status(500).json({ error: 'Failed to fetch history.' });
+  }
+};
+
+export const getReviewById = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    res.json({ review: review.review });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch review' });
   }
 };

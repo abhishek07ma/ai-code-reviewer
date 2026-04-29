@@ -11,13 +11,13 @@ lerna-debug.log*
 node_modules/
 jspm_packages/
 
-# Environment variables
+# Environment variables — actual secrets (never commit)
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.example
+# .env.example files ARE committed — they are safe templates
 
 # Build outputs
 client/dist/

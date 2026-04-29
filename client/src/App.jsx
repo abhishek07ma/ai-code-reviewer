@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Toaster, toast } from 'react-hot-toast';
 import Editor from './components/Editor';
 import ReviewPanel from './components/ReviewPanel';
 import History from './components/History';
@@ -45,6 +46,7 @@ function App() {
 
   const handleReviewCode = async () => {
     if (!code || code.trim() === '') {
+      toast.error('Please enter some code');
       setError('Please enter some code');
       return;
     }
@@ -74,8 +76,12 @@ function App() {
       setReview(data.review);
       setHistoryKey(prev => prev + 1);
       setActiveTab('Overview');
+      toast.success('Code reviewed successfully!');
     } catch (err) {
       console.error(err);
+      toast.error(err.message || 'Review failed. Please try again.', {
+        duration: 5000,
+      });
       setError(err.message || 'Review failed. Please try again.');
     } finally {
       setLoading(false);
@@ -111,6 +117,7 @@ function App() {
   if (!user) {
     return (
       <div className="bg-[#0f172a] text-[#e2e8f0] min-h-screen font-sans flex items-center justify-center">
+        <Toaster position="top-right" />
         <div className="relative w-full max-w-md mx-auto">
           {/* Header/Title outside the modal */}
           <div className="text-center mb-8">
@@ -134,6 +141,13 @@ function App() {
 
   return (
     <div className="bg-[#0f172a] text-[#e2e8f0] min-h-screen font-sans flex flex-col">
+      <Toaster position="top-right" toastOptions={{
+        style: {
+          background: '#1e293b',
+          color: '#e2e8f0',
+          border: '1px solid #334155',
+        },
+      }} />
       {/* Top Header Bar */}
       <header className="flex items-center justify-between px-6 py-3 border-b border-[#334155] bg-[#0f172a] shadow-md flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -199,12 +213,6 @@ function App() {
               'Analyze Code (Ctrl + Enter)'
             )}
           </button>
-
-          {error && (
-            <div className="text-[#ef4444] bg-[#1e293b] border border-[#ef4444] p-3 rounded-lg text-center font-medium shadow-sm">
-              {error}
-            </div>
-          )}
         </div>
 
         {/* Right side: Results */}

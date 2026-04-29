@@ -2,7 +2,7 @@
 
 An intelligent, full-stack application that acts as your personal expert code reviewer. Powered by the Anthropic Claude API, it automatically analyzes your code for bugs, security vulnerabilities, performance bottlenecks, and best practice violations.
 
-![App Screenshot](./placeholder.png) <!-- Replace with real screenshot -->
+![AI Code Review Tool Dashboard](client/src/assets/app.png)
 
 ## Tech Stack
 - **Frontend**: React.js, Vite, TailwindCSS, Monaco Editor
